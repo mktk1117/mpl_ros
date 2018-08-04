@@ -1,3 +1,8 @@
+/**
+ * @file robot.hpp
+ * @brief this file defines Robot class
+ */
+
 #include <mpl_external_planner/poly_map_planner/poly_map_planner.h>
 #include <ros/ros.h>
 
@@ -73,6 +78,11 @@ class Robot {
     nonlinear_obs_ = obs;
   }
 
+  /// Set traj init time manually
+  void set_traj_t(decimal_t t) {
+    traj_t_ = t;
+  }
+
   /**
    * @brief planning thread
    * @param t robot current local time
@@ -88,15 +98,15 @@ class Robot {
     else {
       auto state = traj_.evaluate(t - traj_t_);
       start_ = traj_.evaluate(dt_);
-      if(!history_.empty() && (state.pos - history_.back()).norm() > 0.1)
+      if(!history_.empty() && (state.pos - history_.back()).norm() > 0.2)
         history_.push_back(state.pos);
     }
 
-    if(t - traj_t_ < dt_ || (start_.pos - goal_.pos).norm() < 1)
+    if(t - traj_t_ < dt_ - 1e-8 || (start_.pos - goal_.pos).norm() < 1)
       return true;
 
     if(verbose_)
-       printf("[%s]: start planning at t: %.2f, traj_t: %.2f\n",
+       printf("[%s]: start planning at t: %f, traj_t: %f\n",
               robot_name_.c_str(), t, traj_t_);
 
     ros::Time t0 = ros::Time::now();
@@ -181,7 +191,7 @@ class Robot {
     return get_state(time).pos == goal.pos;
   }
 
- private:
+ protected:
   /// Robot shape
   Polyhedron<Dim> shape_;
   /// Planner
@@ -222,6 +232,8 @@ class Robot {
   bool verbose_{false};
 };
 
+/// Robot 2D
 typedef Robot<2> Robot2D;
 
+/// Robot 3D
 typedef Robot<3> Robot3D;

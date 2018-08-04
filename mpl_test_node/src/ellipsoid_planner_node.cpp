@@ -5,9 +5,6 @@
 #include <planning_ros_utils/primitive_ros_utils.h>
 #include <ros/ros.h>
 
-using namespace MPL;
-
-
 int main(int argc, char **argv) {
   ros::init(argc, argv, "test");
   ros::NodeHandle nh("~");
@@ -47,7 +44,7 @@ int main(int argc, char **argv) {
   t0 = ros::Time::now();
 
   // Initialize planner
-  double dt, v_max, a_max, w, epsilon, t_max;
+  double dt, v_max, a_max, w, epsilon;
   double u_max_z, u_max;
   int max_num, num;
   bool use_3d;
@@ -57,7 +54,6 @@ int main(int argc, char **argv) {
   nh.param("a_max", a_max, -1.0);
   nh.param("u_max", u_max, 1.0);
   nh.param("u_max_z", u_max_z, 1.0);
-  nh.param("t_max", t_max, -1.0);
   nh.param("w", w, 10.);
   nh.param("num", num, 1);
   nh.param("max_num", max_num, -1);
@@ -70,12 +66,11 @@ int main(int argc, char **argv) {
   planner_->setEpsilon(epsilon); // Set greedy param (default equal to 1)
   planner_->setVmax(v_max);      // Set max velocity
   planner_->setAmax(a_max);      // Set max acceleration
-  planner_->setTmax(t_max);      // Set max time
   planner_->setDt(dt);           // Set dt for each primitive
-  planner_->setW(w);             // Set w for each primitive
+  planner_->setW(w);             // Set time weight for each primitive
   planner_->setMaxNum(
       max_num); // Set maximum allowed expansion, -1 means no limitation
-  planner_->setTol(2.0, 2.0, 100.0); // Tolerance for goal region
+  planner_->setTol(2.0, 2.0, 100.0); // Tolerance for goal region as pos, vel, acc
 
   // Set start and goal
   double start_x, start_y, start_z;
