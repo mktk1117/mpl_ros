@@ -180,6 +180,9 @@ void MPLPlannerNode::setupMPLPlanner() {
 
 
 void MPLPlannerNode::processCloud(const sensor_msgs::PointCloud& cloud) {
+  Vec3f ori = startPosition_ - Vec3f(voxelRangeX_, voxelRangeY_, voxelRangeZ_) / 2;
+  Vec3f dim(voxelRangeX_, voxelRangeY_, voxelRangeZ_);
+  voxelGridPtr_->allocate(dim, ori);
   voxelGridPtr_->addCloud(cloud_to_vec(cloud));
   planning_ros_msgs::VoxelMap map = voxelGridPtr_->getMap();
   setVoxelMap(map);
